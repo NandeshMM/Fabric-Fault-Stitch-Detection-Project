@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from ultralytics import YOLO
 import numpy as np
+import datetime
 
 class YOLOVideoCapture:
     def __init__(self, model_path, img_size=320, frame_skip=2):
@@ -27,6 +28,9 @@ class YOLOVideoCapture:
 
         self.stop_button = tk.Button(self.root, text="Stop", command=self.stop)
         self.stop_button.pack()
+
+        # Open a file to record stitches
+        self.log_file = open("stitch_log.txt", "a")
 
     def start_capture(self):
         if not self.running:
@@ -81,7 +85,13 @@ class YOLOVideoCapture:
                         label = 'loose stitch'
                         color = (255, 0, 0)  # Blue color for 'loose stitch'
                     else:
+                        label = 'good stitch'
                         color = (255, 255, 255)  # Default color (white) for other classes
+
+                    # Log detected stitches into the file with timestamp
+                    log_entry = f"{datetime.datetime.now()}: {label} detected with confidence {confidence:.2f}\n"
+                    self.log_file.write(log_entry)
+                    self.log_file.flush()  # Ensure the data is written to the file immediately
 
                     # Draw the bounding box
                     cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 2)
@@ -102,6 +112,7 @@ class YOLOVideoCapture:
             self.display_thread.join()
         self.cap.release()
         cv2.destroyAllWindows()
+        self.log_file.close()  # Close the log file
         self.root.quit()
 
     def start_gui(self):
