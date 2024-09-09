@@ -119,5 +119,5 @@ class YOLOVideoCapture:
         self.root.mainloop()
 
 if __name__ == "__main__":
-    yolo_video = YOLOVideoCapture(model_path='best4.pt')
+    yolo_video = YOLOVideoCapture(model_path='best.pt')
     yolo_video.start_gui()
